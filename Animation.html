@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+
+<html>
+
+<head>
+  
+  
+<title>Kinect &amp; HTML5</title>
+    
+    
+<link rel="stylesheet" href="style.css" />
+
+<script src="web-sockets.js"></script>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="spritespin.js"></script>
+
+	<script type="text/javascript">
+	
+	--> Déclarations globales à être utilisées avec web-socket.js
+	var left = [];
+	var center = [];
+	var right = [];
+
+    var Lhand;
+	var Rhand;
+	var hand;
+	var head;
+	var body;
+	
+	var isHold = false;
+	
+	--> User input déterminant le nombre de rangées dans l'animation. A passer à spritespin.
+	var rowNum = prompt("Veuillez entrer le nombre total de rangées", "0");
+	rowInt = parseInt(rowNum);
+	console.log("Rangées : " + rowInt);
+	
+	--> User input déterminant le nombre de colonnes (de photos par rangée) dans l'animation. A passer à spritespin.
+	var colNum = prompt("Veuillez entrer le nombre total de colonnes (de photos par rangée)", "0");
+	colInt = parseInt(colNum);
+	console.log("Colonnes : " + colInt);
+
+	// Appel à spritespin pour créer une animation avec les paramètres indiqués
+	 $(document).ready(function() {
+	 		$('#360frames').spritespin({
+				source    : SpriteSpin.sourceArray('frame{lane}_{frame}.jpg', {
+					lane: [0,rowInt-1],
+					frame: [0,colInt-1],
+					digits: 1
+					}),
+				width     : 1280,
+				height    : 960,
+				frames    : colInt,
+				lanes     : rowInt,
+				sense     : 1,
+				senseLane : 1,
+				renderer  : 'canvas'
+				});
+	 });
+	 
+	 // Cette fonction existe surtout pour permettre la transformation de la représentation du joint dominant dans
+	 // web-socket.js quand celui-ci usurpe le curseur et appuie sur le div de l'animation du flacon.
+	 $(function(){
+        // Changes the value of isHold when user presses down
+        $('#360frames').bind("mousedown", function (event) {
+        isHold = true;
+        });
+		// Changes the value of isHold when user stops pressing
+		$('#360frames').bind("mouseup", function (event) {
+        isHold = false;
+        });
+    });
+
+	// Tentative desurimposition des joints du squelette sur l'animation
+	var canv = getElementById("canvas");	
+	var dframe = getElementById("#360frames");
+	dframe.appendChild(canv);
+	</script>
+
+</head>
+
+
+<body>
+
+<h1>Kinect &amp; HTML5 WebSocket Animation</h1>
+Status: <label id="status">None</label> 
+<br>
+
+<div id="360frames"></div>
+
+<canvas id="canvas" width="640" height="480" ></canvas>
+
+<input type="button" id="left" value="Gauche" />
+<br>  
+<input type="button" id="body" value="Corps" />
+<br>
+<input type="button" id="right" value="Droite" />
+
+</body>
+
+</html>
